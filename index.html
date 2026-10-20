@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔒 Private</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a0033 0%, #4a0e4e 50%, #8b0057 100%);
+    font-family: 'Georgia', serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  .heart-bg {
+    position: fixed;
+    color: rgba(255, 105, 180, 0.18);
+    font-size: 30px;
+    animation: floatUp linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes floatUp {
+    0%   { transform: translateY(100vh) scale(0.5); opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { transform: translateY(-100px) scale(1.3); opacity: 0; }
+  }
+
+  /* ====== شاشة القفل ====== */
+  .lock-screen {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    max-width: 420px;
+    width: 100%;
+    animation: fadeIn 1s ease;
+  }
+
+  .lock-screen.hide {
+    animation: fadeOut 0.6s forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes fadeOut {
+    to { opacity: 0; transform: scale(0.9); }
+  }
+
+  .lock-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    display: inline-block;
+    animation: beat 1.2s infinite;
+  }
+
+  @keyframes beat {
+    0%, 100% { transform: scale(1); }
+    25%      { transform: scale(1.15); }
+    50%      { transform: scale(1.05); }
+    75%      { transform: scale(1.15); }
+  }
+
+  .lock-title {
+    color: #ffb3d9;
+    font-size: 1.6rem;
+    margin-bottom: 25px;
+    text-shadow: 0 0 20px rgba(255, 105, 180, 0.8);
+  }
+
+  .name-input {
+    width: 100%;
+    padding: 16px 20px;
+    border-radius: 50px;
+    border: 2px solid rgba(255, 105, 180, 0.5);
+    background: rgba(0, 0, 0, 0.5);
+    color: #ffe0f0;
+    font-size: 1.1rem;
+    font-family: 'Georgia', serif;
+    text-align: center;
+    outline: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .name-input::placeholder {
+    color: rgba(255, 179, 217, 0.5);
+  }
+
+  .name-input:focus {
+    border-color: #ff69b4;
+    box-shadow: 0 0 25px rgba(255, 105, 180, 0.7);
+  }
+
+  .enter-btn {
+    margin-top: 20px;
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #ff69b4, #c71585);
+    color: white;
+    font-size: 1.1rem;
+    font-family: 'Georgia', serif;
+    cursor: pointer;
+    box-shadow: 0 0 25px rgba(255, 105, 180, 0.6);
+    transition: all 0.3s ease;
+  }
+
+  .enter-btn:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 40px rgba(255, 105, 180, 0.9);
+  }
+
+  .enter-btn:active { transform: scale(0.97); }
+
+  .error-msg {
+    color: #ff6b9d;
+    margin-top: 15px;
+    font-size: 0.95rem;
+    min-height: 22px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .error-msg.show { opacity: 1; }
+
+  .shake { animation: shake 0.5s; }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25%      { transform: translateX(-10px); }
+    50%      { transform: translateX(10px); }
+    75%      { transform: translateX(-10px); }
+  }
+
+  /* ====== الصفحة الرئيسية ====== */
+  .main-content {
+    display: none;
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .main-content.show {
+    display: block;
+    animation: fadeIn 1.2s ease;
+  }
+
+  .title {
+    font-size: 2.4rem;
+    color: #ffb3d9;
+    margin-bottom: 35px;
+    text-shadow: 0 0 20px rgba(255, 105, 180, 0.8);
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes glow {
+    from { text-shadow: 0 0 20px rgba(255, 105, 180, 0.6); }
+    to   { text-shadow: 0 0 40px rgba(255, 105, 180, 1), 0 0 60px rgba(255, 192, 203, 0.7); }
+  }
+
+  /* ====== قسم الكلام الرومانسي ====== */
+  .section-title {
+    color: #ffb3d9;
+    font-size: 1.5rem;
+    margin: 40px 0 20px;
+    text-shadow: 0 0 15px rgba(255, 105, 180, 0.6);
+    letter-spacing: 1px;
+    opacity: 0;
+    animation: fadeUp 1.2s forwards;
+    animation-delay: 0.2s;
+  }
+
+  .love-words {
+    list-style: none;
+    margin-bottom: 20px;
+  }
+
+  .love-words li {
+    font-size: 1.3rem;
+    color: #ffe0f0;
+    padding: 10px 15px;
+    margin: 8px 0;
+    border-radius: 15px;
+    background: rgba(255, 105, 180, 0.08);
+    border: 1px solid rgba(255, 105, 180, 0.25);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 1.2s forwards;
+    transition: all 0.3s ease;
+  }
+
+  .love-words li:hover {
+    background: rgba(255, 105, 180, 0.25);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+  }
+
+  .love-words li:nth-child(1) { animation-delay: 0.5s; }
+  .love-words li:nth-child(2) { animation-delay: 1.35s; }
+  .love-words li:nth-child(3) { animation-delay: 2.2s; }
+  .love-words li:nth-child(4) { animation-delay: 3.05s; }
+  .love-words li:nth-child(5) { animation-delay: 3.9s; }
+  .love-words li:nth-child(6) { animation-delay: 4.75s; }
+  .love-words li:nth-child(7) { animation-delay: 5.6s; }
+  .love-words li:nth-child(8) { animation-delay: 6.45s; }
+  .love-words li:nth-child(9) { animation-delay: 7.3s; }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ====== القلب ====== */
+  .heart-icon {
+    font-size: 3rem;
+    display: inline-block;
+    animation: beat 1s infinite;
+    margin: 20px 0;
+    opacity: 0;
+    animation: heartAppear 1s forwards, beat 1s 1s infinite;
+  }
+
+  @keyframes heartAppear {
+    to { opacity: 1; }
+  }
+
+  /* ====== قسم الذكريات (Timeline) ====== */
+  .memories {
+    margin-top: 20px;
+    padding: 0 5px;
+    position: relative;
+  }
+
+  .memory-card {
+    position: relative;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1.5px solid rgba(255, 105, 180, 0.4);
+    border-radius: 18px;
+    padding: 20px 22px;
+    margin: 18px 0;
+    text-align: right;
+    direction: rtl;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 25px rgba(255, 105, 180, 0.25);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: cardUp 1.3s forwards;
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+
+  .memory-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 5px;
+    height: 100%;
+    background: linear-gradient(to bottom, #ff69b4, #c71585);
+  }
+
+  .memory-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 0 40px rgba(255, 105, 180, 0.6);
+    border-color: #ff69b4;
+  }
+
+  .memory-card:nth-child(1) { animation-delay: 0.5s; }
+  .memory-card:nth-child(2) { animation-delay: 1.2s; }
+  .memory-card:nth-child(3) { animation-delay: 1.9s; }
+  .memory-card:nth-child(4) { animation-delay: 2.6s; }
+  .memory-card:nth-child(5) { animation-delay: 3.3s; }
+
+  @keyframes cardUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .memory-date {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff69b4, #c71585);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    margin-bottom: 12px;
+    box-shadow: 0 0 15px rgba(255, 105, 180, 0.6);
+    font-family: 'Georgia', serif;
+  }
+
+  .memory-text {
+    color: #ffe0f0;
+    font-size: 1.15rem;
+    line-height: 1.7;
+  }
+
+  .mute-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 105, 180, 0.6);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    color: #ffb3d9;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+    transition: all 0.3s ease;
+  }
+
+  .mute-btn.show { display: flex; }
+  .mute-btn:hover { transform: scale(1.1); }
+  .mute-btn:active { transform: scale(0.9); }
+
+  audio { display: none; }
+
+  .footer {
+    margin-top: 30px;
+    color: #ffb3d9;
+    font-size: 1rem;
+    opacity: 0.8;
+  }
+
+  /* موبايل */
+  @media (max-width: 480px) {
+    .title { font-size: 1.8rem; }
+    .section-title { font-size: 1.2rem; }
+    .love-words li { font-size: 1.1rem; }
+    .memory-text { font-size: 1rem; }
+    .memory-card { padding: 16px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ====== شاشة القفل ====== -->
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-icon">🔐</div>
+  <h1 class="lock-title">Who's there? 💕</h1>
+  <input 
+    type="text" 
+    id="nameInput" 
+    class="name-input" 
+    placeholder="Enter your name..." 
+    autocomplete="off"
+    autofocus
+  >
+  <button class="enter-btn" onclick="checkName()">Unlock ❤️</button>
+  <p class="error-msg" id="errorMsg"></p>
+</div>
+
+<!-- ====== زر الكتم ====== -->
+<button class="mute-btn" id="muteBtn" onclick="toggleMute()" title="Mute / Unmute">🔊</button>
+
+<!-- ====== الصفحة الرئيسية ====== -->
+<div class="main-content" id="mainContent">
+  <h1 class="title">❤️ To My Everything ❤️</h1>
+
+  <ul class="love-words">
+    <li>My soul</li>
+    <li>My life</li>
+    <li>My everything</li>
+    <li>My babyyyy girl</li>
+    <li>Soul of my soul</li>
+    <li>Daddy's heart</li>
+    <li>My soulmate</li>
+    <li>Love of my life</li>
+    <li>My warm hug</li>
+  </ul>
+
+  <div class="heart-icon">💖</div>
+
+  <!-- ====== قسم الذكريات ====== -->
+  <h2 class="section-title">✨ Memory Lane ✨</h2>
+
+  <div class="memories">
+    <div class="memory-card">
+      <span class="memory-date">1 / 2 / 2007</span>
+      <p class="memory-text">يوم ما الدنيا اتجملت واتولدت أجمل حاجة فيها 🌸</p>
+    </div>
+
+    <div class="memory-card">
+      <span class="memory-date">8 / 10 / 2025</span>
+      <p class="memory-text">أول كلمة ليك معايا في الشات 🥺</p>
+    </div>
+
+    <div class="memory-card">
+      <span class="memory-date">5 / 5 / 2026</span>
+      <p class="memory-text">يوم ما كنتي مبسوطة إني عملتلك كل البنوك ✨</p>
+    </div>
+
+    <div class="memory-card">
+      <span class="memory-date">6 / 10 / 2026</span>
+      <p class="memory-text">أول ما اتعرفنا واتفقنا نتقابل ☺️</p>
+    </div>
+
+    <div class="memory-card">
+      <span class="memory-date">7 / 10 / 2026</span>
+      <p class="memory-text">يوم ما اتقابلنا من الساعة 1:40 لـ 1:57 🤭 وفكرت ليك كارنيه 😅</p>
+    </div>
+  </div>
+
+  <p class="footer">Made with ❤️ just for you</p>
+</div>
+
+<!-- ضع ملف الصوت بتاعك هنا وسميه love.mp3 -->
+<audio id="bgAudio" loop>
+  <source src="love.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+  /* ============================================
+     ✏️ غيّر الاسم هنا 👇
+  ============================================ */
+  const SECRET_NAME = "nada";
+
+  /* ============================================ */
+
+  // ===== قلوب متحركة في الخلفية =====
+  const hearts = ['❤️', '💕', '💖', '💗', '💓', '🌹'];
+  for (let i = 0; i < 25; i++) {
+    const h = document.createElement('div');
+    h.className = 'heart-bg';
+    h.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+    h.style.left = Math.random() * 100 + 'vw';
+    h.style.fontSize = (15 + Math.random() * 30) + 'px';
+    h.style.animationDuration = (8 + Math.random() * 10) + 's';
+    h.style.animationDelay = (Math.random() * 10) + 's';
+    document.body.appendChild(h);
+  }
+
+  // ===== عناصر الصفحة =====
+  const lockScreen = document.getElementById('lockScreen');
+  const mainContent = document.getElementById('mainContent');
+  const nameInput = document.getElementById('nameInput');
+  const errorMsg = document.getElementById('errorMsg');
+  const muteBtn = document.getElementById('muteBtn');
+  const audio = document.getElementById('bgAudio');
+  let muted = false;
+
+  audio.volume = 0.7;
+
+  // ===== التحقق من الاسم =====
+  function checkName() {
+    const entered = nameInput.value.trim().toLowerCase();
+
+    if (entered === SECRET_NAME.toLowerCase()) {
+      // ✅ نشغل الصوت فوراً جوه الـ click (مضمون 100%)
+      audio.play()
+        .then(() => console.log("✅ Music started"))
+        .catch((err) => console.log("❌ Audio blocked:", err));
+
+      errorMsg.classList.remove('show');
+      lockScreen.classList.add('hide');
+
+      setTimeout(() => {
+        lockScreen.style.display = 'none';
+        mainContent.classList.add('show');
+        muteBtn.classList.add('show');
+      }, 600);
+
+    } else {
+      errorMsg.textContent = "That's not my name 🙃 try again";
+      errorMsg.classList.add('show');
+      lockScreen.classList.add('shake');
+      nameInput.value = '';
+      setTimeout(() => lockScreen.classList.remove('shake'), 500);
+    }
+  }
+
+  // ===== Enter يشتغل زي الزرار =====
+  nameInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') checkName();
+  });
+
+  // ===== زر الكتم =====
+  function toggleMute() {
+    muted = !muted;
+    audio.muted = muted;
+    muteBtn.textContent = muted ? '🔇' : '🔊';
+  }
+</script>
+
+</body>
+</html>
